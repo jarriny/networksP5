@@ -2,8 +2,48 @@
 import socket
 import sys
 import ssl
+from html.parser import HTMLParser
 
+csrftoken = ""
+username = ""
+password = ""
+csrfmiddlewaretoken = ""
+nextt = ""
+
+class parserGET(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        print("Encountered a start tag:", tag)
+
+
+#create a socket to the host on the https port
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     s = ssl.wrap_socket(sock) 
-    
-    s.connect((hostname, int(port)))
+    s.connect(("fakebook.3700.network", 443))
+    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+"""
+if( x == 0):
+            print 'Socket Keepalive off, turning on'
+            x = sock.setsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+            print 'setsockopt=', x
+        else:
+            print 'Socket Keepalive already on'
+"""
+
+#do a GET request for the homepage
+# @@@@ fakebook.3700.network/
+request = "GET /accounts/login/?next=/fakebook/ HTTP/1.0\r\n\r\n"
+s.sendall(bytes(request, 'utf-8'))
+#s.send(request.encode()) #@@@@@ when do you implement keep alive??
+
+#recive the answer from the GET
+response = s.recv(4096).decode('utf-8') 
+print(response)
+
+#send POST request to login
+pRequest = "POST /accounts/login/ HTTP/1.0"
+parser = parserGET()
+parser.feed(response)
+
+
+
