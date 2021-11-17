@@ -4,12 +4,10 @@ import sys
 import ssl
 from html.parser import HTMLParser
 
-csrftoken = ""
+csrftoken = ''
 username = "jarrin.y"
 password = "ZDPZ6OOA7MNCW512"
-csrfmiddlewaretoken = ""
 nextt = "%2Ffakebook%2F"
-
 csrfmiddle = ''
 
 comp = ""
