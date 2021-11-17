@@ -5,10 +5,10 @@ import ssl
 from html.parser import HTMLParser
 
 csrftoken = ""
-username = ""
-password = ""
+username = "jarrin.y"
+password = "ZDPZ6OOA7MNCW512"
 csrfmiddlewaretoken = ""
-nextt = ""
+nextt = "%2Ffakebook%2F"
 
 csrfmiddle = ''
 
@@ -100,37 +100,7 @@ def process_html(html):
         history.add(link)
         process_html(next_html)
 
-
-#create a socket to the host on the https port
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    s = ssl.wrap_socket(sock) 
-    s.connect(("fakebook.3700.network", 443))
-    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-
-"""
-if( x == 0):
-            print 'Socket Keepalive off, turning on'
-            x = sock.setsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-            print 'setsockopt=', x
-        else:
-            print 'Socket Keepalive already on'
-"""
-
-#do a GET request for the homepage
-# @@@@ fakebook.3700.network/
-request = "GET /accounts/login/?next=/fakebook/ HTTP/1.0\r\n\r\n"
-s.sendall(bytes(request, 'utf-8'))
-#s.send(request.encode()) #@@@@@ when do you implement keep alive??
-
-#recive the answer from the GET
-resp = s.recv(4096).decode('utf-8') 
-# print(response)
-
-#send POST request to login
-pRequest = "POST /accounts/login/ HTTP/1.0"
-parser = parserGET()
-# parser.feed(response)
-
+        
 def process_response(response):
     split_response = response.split("\r\n\r\n\n\n\n")
     header = split_response[0]
@@ -146,15 +116,37 @@ def process_response(response):
             sp = item.split(': ')
             header_dict[sp[0]] = sp[1]
     return header_dict, html
+        
+#create a socket to the host on the https port
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    s = ssl.wrap_socket(sock) 
+    s.connect(("fakebook.3700.network", 443))
+    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+
+#do a GET request for the homepage
+# @@@@ fakebook.3700.network/
+request = "GET /accounts/login/?next=/fakebook/ HTTP/1.0\r\n\r\n"
+s.sendall(bytes(request, 'utf-8'))
+#s.send(request.encode()) #@@@@@ when do you implement keep alive??
+
+#recive the answer from the GET
+resp = s.recv(4096).decode('utf-8') 
+# print(response)
+
+#send POST request to login
+pRequest = "POST /accounts/login/ HTTP/1.0"
+parser = parserGET()
+
 
 my_header, my_html = process_response(resp)
 
-cookie = my_header['Set-Cookie'].split()[0][:-1]
+csrftoken = my_header['Set-Cookie'].split()[0][:-1]
 
 parser = MyHTMLParser()
 parser.feed(my_html)
 
-print(cookie)
+print(csrftoken)
 
 
 
