@@ -146,6 +146,29 @@ parser.feed(my_html)
 
 print(csrftoken)
 
+postStuff = "Host: fakebook.3700.network
+Connection: keep-alive
+Content-Length: 148
+Cache-Control: max-age=0
+sec-ch-ua: \"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: \"Windows\"
+Upgrade-Insecure-Requests: 1
+Origin: https://fakebook.3700.network
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+cp-extension-installed: Yes
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Referer: https://fakebook.3700.network/accounts/login/?next=/fakebook/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,fr;q=0.8"
+cookieText = "Cookie: csrftoken=" + csrftoken + "\r\n\r\n"
+# added the \r\n\r\n becuase I think what comes next is the body
+userPassToken = "username=" + username + "&password=" + password + "&csrfmiddlewaretoken=" + csrfmiddlewaretoken + "&next=" + nextt
 
 
 # print(csrfmiddle)
