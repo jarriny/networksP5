@@ -116,7 +116,7 @@ def process_response(response):
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     s = ssl.wrap_socket(sock) 
     s.connect(("fakebook.3700.network", 443))
-    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 30)
 
 
 #do a GET request for the homepage
@@ -127,10 +127,7 @@ s.sendall(bytes(request, 'utf-8'))
 
 #recive the answer from the GET
 resp = s.recv(4096).decode('utf-8') 
-# print(response)
-
-#send POST request to login
-pRequest = "POST /accounts/login/ HTTP/1.0"
+print(resp)
 
 
 my_header, my_html = process_response(resp)
@@ -143,30 +140,62 @@ parser.feed(my_html)
 print("the csrf token we found: " + str(csrftoken))
 print("the csrfmiddle token we found" + str(csrfmiddle))
 
-postStuff = "Host: fakebook.3700.network
-Connection: keep-alive
-Content-Length: 148
-Cache-Control: max-age=0
-sec-ch-ua: \"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"
-sec-ch-ua-mobile: ?0
-sec-ch-ua-platform: \"Windows\"
-Upgrade-Insecure-Requests: 1
-Origin: https://fakebook.3700.network
-Content-Type: application/x-www-form-urlencoded
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-cp-extension-installed: Yes
-Sec-Fetch-Site: same-origin
-Sec-Fetch-Mode: navigate
-Sec-Fetch-User: ?1
-Sec-Fetch-Dest: document
-Referer: https://fakebook.3700.network/accounts/login/?next=/fakebook/
-Accept-Encoding: gzip, deflate, br
-Accept-Language: en-US,en;q=0.9,fr;q=0.8"
-cookieText = "Cookie: csrftoken=" + csrftoken + "\r\n\r\n"
+postStuff = "Host: fakebook.3700.network\r\n" + "Connection: keep-alive\r\n" + "Content-Length: 148\r\n" + "Cache-Control: max-age=0\r\n"
+postStuff += "sec-ch-ua: \"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"\r\n"
+postStuff += "sec-ch-ua-mobile: ?0\r\n" + "sec-ch-ua-platform: \"Windows\"\r\n" + "Upgrade-Insecure-Requests: 1\r\n"
+postStuff += "Origin: https://fakebook.3700.network\r\n" + "Content-Type: application/x-www-form-urlencoded\r\n"
+postStuff += "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36\r\n"
+postStuff += "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n"
+postStuff += "cp-extension-installed: Yes\r\n" + "Sec-Fetch-Site: same-origin\r\n" + "Sec-Fetch-Mode: navigate\r\n" + "Sec-Fetch-User: ?1\r\n"
+postStuff += "Sec-Fetch-Dest: document\r\n" + "Referer: https://fakebook.3700.network/accounts/login/?next=/fakebook/\r\n"
+postStuff += "Accept-Encoding: gzip, deflate, br\r\n" + "Accept-Language: en-US,en;q=0.9,fr;q=0.8\r\n"
+
+
+cookieText = "Cookie: " + csrftoken + "\r\n\r\n"
 # added the \r\n\r\n becuase I think what comes next is the body
-userPassToken = "username=" + username + "&password=" + password + "&csrfmiddlewaretoken=" + csrfmiddle + "&next=" + nextt
+userPassToken = "username=" + username + "&password=" + password + "&csrfmiddlewaretoken=" + csrfmiddle + "&next=" + nextt + "\r\n\r\n"
+#@@@@@@@@@@added \r\n\r\n to the end bc ??
 
+#send POST request to login
+pRequest = "POST /accounts/login/ HTTP/1.0\r\n"
+pRequest += postStuff
+pRequest += cookieText
+pRequest += userPassToken
 
-# print(csrfmiddle)
-# print(frontier)
+print("pRequest :" + pRequest)
+
+#CREATING SECOND SOCKET
+s = s.unwrap()
+s.close()
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    s = ssl.wrap_socket(sock)
+    s.connect(("fakebook.3700.network", 443))
+    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 30)
+
+#send the POST to login
+s.sendall(bytes(pRequest, 'utf-8'))
+
+#what received after loggin in
+resp = s.recv(4096).decode('utf-8')
+print("what received after loogin in" + resp)
+
+#CREATING THIRD SOCKET
+try:
+  s = s.unwrap()
+except:
+  print("hi")
+s.close()
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    s = ssl.wrap_socket(sock)
+    s.connect(("fakebook.3700.network", 443))
+    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 30)
+
+request = "GET /fakebook/ HTTP/1.0\r\n\r\n"
+s.sendall(bytes(request, 'utf-8'))
+#s.send(request.encode()) #@@@@@ when do you implement keep alive??
+
+#recive the answer from the GET
+resp = s.recv(4096).decode('utf-8')
+print(resp)
