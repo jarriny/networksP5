@@ -43,9 +43,6 @@ mock_start_3 = '<a href=\"1\">mock</a>'
 
 mock_csrf = '<input type="hidden" name="csrfmiddlewaretoken" value="zeVpBxYQf2FA3XLPXBOXn6k03urJ2SXK3QW7SJ5IigjiVym9NSSXw9cupy0RdvGp">'
 
-class parserGET(HTMLParser):
-    def handle_starttag(self, tag, attrs):
-        print("Encountered a start tag:", tag)
 
 class MyHTMLParser(HTMLParser):
 
@@ -134,7 +131,6 @@ resp = s.recv(4096).decode('utf-8')
 
 #send POST request to login
 pRequest = "POST /accounts/login/ HTTP/1.0"
-parser = parserGET()
 
 
 my_header, my_html = process_response(resp)
@@ -144,7 +140,8 @@ csrftoken = my_header['Set-Cookie'].split()[0][:-1]
 parser = MyHTMLParser()
 parser.feed(my_html)
 
-print(csrftoken)
+print("the csrf token we found: " + str(csrftoken))
+print("the csrfmiddle token we found" + str(csrfmiddle))
 
 postStuff = "Host: fakebook.3700.network
 Connection: keep-alive
