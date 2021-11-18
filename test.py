@@ -12,8 +12,15 @@ csrftoken = ''
 # username = "jarrin.y"
 # password = "ZDPZ6OOA7MNCW512"
 
-username = "hill.bri"
-password = "QYHNOH9FA44LSQ12"
+args = sys.argv
+length = len(args)
+
+username = args[1]
+password = args[2]
+#print("username : " + username + "password: " + password)
+
+#username = "hill.bri"
+#password = "QYHNOH9FA44LSQ12"
 
 nextt = "%2Ffakebook%2F"
 csrfmiddle = ''
@@ -238,7 +245,7 @@ cookieText = "Cookie: " + csrftoken + "\r\n\r\n"
 userPassToken = "username=" + username + "&password=" + password + "&csrfmiddlewaretoken=" + csrfmiddle + "&next=" + nextt + "\r\n\r\n"
 
 #send POST request to login
-pRequest = "POST /accounts/login/ HTTP/1.0\r\n"
+pRequest = "POST /accounts/login/ HTTP/1.1\r\n"
 pRequest += postStuff
 pRequest += cookieText
 pRequest += userPassToken

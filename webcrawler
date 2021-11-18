@@ -121,7 +121,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 
 #do a GET request for the homepage
 # @@@@ fakebook.3700.network/
-request = "GET /accounts/login/?next=/fakebook/ HTTP/1.0\r\n\r\n"
+request = "GET /accounts/login/?next=/fakebook/ HTTP/1.0\r\nConnection: keep-alive\r\n\r\n"
 s.sendall(bytes(request, 'utf-8'))
 #s.send(request.encode()) #@@@@@ when do you implement keep alive??
 
@@ -164,14 +164,6 @@ pRequest += userPassToken
 
 print("pRequest :" + pRequest)
 
-#CREATING SECOND SOCKET
-s = s.unwrap()
-s.close()
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    s = ssl.wrap_socket(sock)
-    s.connect(("fakebook.3700.network", 443))
-    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 30)
 
 #send the POST to login
 s.sendall(bytes(pRequest, 'utf-8'))
@@ -180,22 +172,4 @@ s.sendall(bytes(pRequest, 'utf-8'))
 resp = s.recv(4096).decode('utf-8')
 print("what received after loogin in" + resp)
 
-#CREATING THIRD SOCKET
-try:
-  s = s.unwrap()
-except:
-  print("hi")
-s.close()
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    s = ssl.wrap_socket(sock)
-    s.connect(("fakebook.3700.network", 443))
-    s.getsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 30)
-
-request = "GET /fakebook/ HTTP/1.0\r\n\r\n"
-s.sendall(bytes(request, 'utf-8'))
-#s.send(request.encode()) #@@@@@ when do you implement keep alive??
-
-#recive the answer from the GET
-resp = s.recv(4096).decode('utf-8')
-print(resp)
